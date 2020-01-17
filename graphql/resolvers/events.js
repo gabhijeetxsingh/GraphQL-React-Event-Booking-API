@@ -17,7 +17,11 @@ module.exports = {
             throw err;
         };
     },
-    createEvent: async (args) => {
+    createEvent: async (args, req) => {
+
+        if(!req.isAuth) {
+            throw new Error("Unauthenticated!")
+        }
         try {
 
             const event = new Event({
@@ -25,7 +29,7 @@ module.exports = {
                 description : args.eventInput.description,
                 price : +args.eventInput.price,
                 date : new Date(args.eventInput.date),
-                creator : mongoose.Types.ObjectId('5e20bddde4c0cc1f31cff656')             
+                creator : mongoose.Types.ObjectId(req.userId)             
             })
             
             let createdEvent;
@@ -33,7 +37,7 @@ module.exports = {
             let result = await event.save()
 
             createdEvent = transformEvent(result);
-            let creator = await User.findById(mongoose.Types.ObjectId('5e20bddde4c0cc1f31cff656'))
+            let creator = await User.findById(mongoose.Types.ObjectId(req.userId))
 
             if(!creator) {
                 throw new Error("User does not exists")
