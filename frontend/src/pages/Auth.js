@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './Auth.css'
-import { buildClientSchema } from 'graphql';
 
 class AuthPage extends Component {
 
@@ -81,11 +80,11 @@ class AuthPage extends Component {
     render() {
         return (<form className="auth-form" onSubmit={this.submitHandler}>
             <div className="form-control">
-                <label htmlForm="email">Email</label>
+                <label htmlFor="email">Email</label>
                 <input type="email" id="email" ref={this.emailEl}/>
             </div>
             <div className="form-control">
-                <label htmlForm="password">Password</label>
+                <label htmlFor="password">Password</label>
                 <input type="password" id="password" ref={this.passwordEl}/>
             </div>
             <div className="form-actions">
