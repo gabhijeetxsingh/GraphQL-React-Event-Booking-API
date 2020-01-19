@@ -13,7 +13,6 @@ module.exports = {
         try {
             const bookings = await Booking.find();
             return bookings.map(booking=>{
-
                 return transformBooking(booking)
             })
         }
