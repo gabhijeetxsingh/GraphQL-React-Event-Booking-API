@@ -6,7 +6,7 @@ const eventLoader = new DataLoader((eventIds)=>{
     return events(eventIds)
 })
 
-const userLoader = new DataLoader((userIds)=>{
+const userLoader = new DataLoader(userIds =>{
     return User.find({_id : { $in : userIds }})
 })
 
@@ -14,11 +14,9 @@ const events = async eventIds => {
     try {
         let events = await Event.find({_id : {$in : eventIds}})
 
-        events.map(event => {
+        return events.map(event => {
             return transformEvent(event);
         })
-
-        return events;
 
     }catch(err) {
         throw err;
@@ -39,7 +37,11 @@ const user = async userId => {
     try {
         let user = await userLoader.load(userId.toString());
 
-        return {...user._doc, _id : user.id, createdEvents : eventLoader.loadMany.bind(this, user._doc.createdEvents)}
+        return {
+            ...user._doc,
+             _id : user.id, 
+             createdEvents : ()=> eventLoader.loadMany(user._doc.createdEvents)
+            }
     }catch(err){
         throw err;
     }
