@@ -2,12 +2,15 @@ import React, {Component} from 'react';
 import AuthCotext from "../context/auth-context";
 import Spinner from '../components/Spinner/Spinner';
 import BookingList from '../components/Bookings/BookingList/BookingList';
+import BookingChart from '../components/Bookings/BookingsChart/BookingsChart';
+import BookingControls from '../components/Bookings/BookingsControls/BookingControls';
 
 class BoookingsPage extends Component {
 
     state = {
         isLoading : false,
-        bookings : []
+        bookings : [],
+        outputType : 'list'
     }
 
     isActive = true;
@@ -35,6 +38,7 @@ class BoookingsPage extends Component {
                             _id
                             title
                             date
+                            price
                         }
                     }
                 }
@@ -78,13 +82,16 @@ class BoookingsPage extends Component {
 
         let requstBody = {
             query : `
-                mutation {
-                    cancelBooking(bookingId : "${bookingId}") {
-                        _id
-                        title
+                    mutation CancelBooking($id : ID!) {
+                        cancelBooking(bookingId : $id) {
+                            _id
+                            title
+                        }
                     }
-                }
-            `
+                `,
+            variables : {
+                id : bookingId
+            }
         };
 
         fetch("http://localhost:4000/graphql", {
@@ -120,11 +127,31 @@ class BoookingsPage extends Component {
         })
     }
 
+    changeOutputTypeHandler = (outputType) => {
+        if(outputType === "list") {
+            this.setState({outputType : 'list'})
+        }
+        else {
+            this.setState({outputType : 'chart'})
+        }
+    }
+
     render() {
+        let content = <Spinner/>;
+
+        if(!this.state.isLoading) {
+            content = (
+                <React.Fragment>
+                    <BookingControls activeOutputType={this.state.outputType} onChange={this.changeOutputTypeHandler}/>
+                    <div>
+                        {this.state.outputType === "list" ? (<BookingList bookings={this.state.bookings} onDelete={this.deleteBookingHandler}/>) : (<BookingChart bookings={this.state.bookings}/>)}
+                    </div>
+                </React.Fragment>
+            )
+        }
         return (
         <React.Fragment>
-            {this.state.isLoading ? <Spinner/> : (
-            <BookingList bookings={this.state.bookings} onDelete={this.deleteBookingHandler}/>)}
+            {content}
         </React.Fragment>)
         
     }
